@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>FP ADMIN - Supreme Management</title>
+    <style>
+        :root { --primary: #00f2ff; --bg: #0a0a0a; --card: #151515; }
+        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .glass-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 30px; width: 95%; max-width: 1250px; box-shadow: 0 0 30px rgba(0,242,255,0.1); }
+        h2 { color: var(--primary); text-transform: uppercase; letter-spacing: 3px; text-align: center; margin-bottom: 5px; }
+        #roleBadge { text-align: center; font-size: 10px; color: #888; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        .controls { background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        input { padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; outline: none; }
+        button { padding: 10px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 11px; }
+        .btn-create { background: var(--primary); color: #000; padding: 12px 20px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { color: var(--primary); border-bottom: 2px solid var(--primary); padding: 12px; text-align: left; }
+        td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
+        .countdown { font-family: 'Courier New', monospace; color: #00f2ff; font-weight: bold; background: #000; padding: 4px 8px; border-radius: 5px; }
+        .status-on { color: #00ff88; font-weight: bold; }
+        .actions { display: flex; gap: 4px; }
+        .hwid-box { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; color: #888; }
+    </style>
+</head>
+<body>
+    <div id="loginSection" class="glass-card" style="max-width: 400px;">
+        <h2>FP ADMIN</h2>
+        <p style="text-align: center; color: #555; font-size: 12px;">Insira sua Chave de Acesso</p>
+        <input type="password" id="adminPass" placeholder="Chave de Acesso" style="width: 85%; display: block; margin: 10px auto;">
+        <button class="btn-create" style="width: 92%; display: block; margin: 10px auto;" onclick="checkAdmin()">ENTRAR NO SISTEMA</button>
+    </div>
+
+    <div id="adminPanel" class="glass-card" style="display:none;">
+        <h2>PAINEL SUPREME - FP</h2>
+        <div id="roleBadge">Acesso: <span id="currentRoleText">---</span></div>
+        
+        <div class="controls">
+            <input type="text" id="u" placeholder="Novo Usuário">
+            <input type="text" id="p" placeholder="Senha">
+            <input type="number" id="d" placeholder="Dias (999=Perm)">
+            <button class="btn-create" onclick="createUser()">CRIAR ACESSO</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuário</th>
+                    <th>Senha</th>
+                    <th>Tempo Restante</th>
+                    <th>Status</th>
+                    <th>HWID</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="userList"></tbody>
+        </table>
+    </div>
+
+    <script>
+        const dbURL = "https://fp-autoclick-default-rtdb.firebaseio.com/usuarios";
+        let currentUserRole = ""; 
+
+        function checkAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            
+            if(pass === "JOTA2026") {
+                currentUserRole = "ADMIN";
+                iniciarPainel();
+            } else if(pass === "MOD123") { // Senha do Moderador
+                currentUserRole = "MOD";
+                iniciarPainel();
+            } else { 
+                alert("Acesso Negado!"); 
+            }
+        }
+
+        function iniciarPainel() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('currentRoleText').innerText = currentUserRole;
+            loadUsers();
+            setInterval(loadUsers, 10000);
+            startClock();
+        }
+
+        async function createUser() {
+            const u = document.getElementById('u').value.trim();
+            const p = document.getElementById('p').value.trim();
+            const d = document.getElementById('d').value;
+            if(!u || !p || !d) return alert("Preencha todos os campos!");
+            
+            let exp = (d >= 999) ? "PERMANENTE" : new Date().getTime() + (d * 24 * 60 * 60 * 1000);
+            
+            await fetch(`${dbURL}/${u}.json`, { 
+                method: 'PUT', 
+                body: JSON.stringify({ password: p, hwid: "", expires: exp, last_seen: 0 }) 
+            });
+            
+            document.getElementById('u').value = "";
+            document.getElementById('p').value = "";
+            document.getElementById('d').value = "";
+            loadUsers();
+        }
+
+        async function loadUsers() {
+            const res = await fetch(`${dbURL}.json`);
+            const data = await res.json();
+            const list = document.getElementById('userList');
+            if(!data) { list.innerHTML = ""; return; }
+            
+            list.innerHTML = "";
+            const agora = new Date().getTime();
+            
+            for (let id in data) {
+                let isOnline = (agora - data[id].last_seen) < 60000;
+                
+                // Lógica de botões baseada no cargo
+                let botoesAcao = `
+                    <button style="background:#3498db; color:white" onclick="editID('${id}')">User</button>
+                    <button style="background:#9b59b6; color:white" onclick="editPass('${id}')">Senha</button>
+                    <button style="background:#2ecc71; color:white" onclick="editDays('${id}')">Dias</button>
+                `;
+
+                if (currentUserRole === "ADMIN") {
+                    botoesAcao += `
+                        <button style="background:orange; color:black" onclick="resetHWID('${id}')">Reset</button>
+                        <button style="background:red; color:white" onclick="deleteUser('${id}')">X</button>
+                    `;
+                }
+
+                list.innerHTML += `<tr>
+                    <td><b>${id}</b></td>
+                    <td>${data[id].password}</td>
+                    <td><span class="countdown" data-expire="${data[id].expires}">--</span></td>
+                    <td class="${isOnline ? 'status-on' : ''}">${isOnline ? '● ONLINE' : '○ offline'}</td>
+                    <td><span class="hwid-box" title="${data[id].hwid}">${data[id].hwid || "Livre"}</span></td>
+                    <td class="actions">
+                        ${botoesAcao}
+                    </td>
+                </tr>`;
+            }
+        }
+
+        function startClock() {
+            setInterval(() => {
+                document.querySelectorAll('.countdown').forEach(el => {
+                    const exp = el.getAttribute('data-expire');
+                    if(exp === "PERMANENTE") { el.innerHTML = "VITALÍCIO"; return; }
+                    
+                    const diff = exp - new Date().getTime();
+                    if(diff <= 0) { 
+                        el.innerHTML = "EXPIRADO"; 
+                        el.style.color = "red"; 
+                    } else {
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        const m = Math.floor((diff % 3600000) / 60000);
+                        const s = Math.floor((diff % 60000) / 1000);
+                        el.innerHTML = `${d}d ${h}h ${m}m ${s}s`;
+                    }
+                });
+            }, 1000);
+        }
+
+        // Funções de Edição
+        async function editID(oldID) {
+            const newID = prompt("Novo nome de usuário:", oldID);
+            if(newID && newID !== oldID) {
+                const res = await fetch(`${dbURL}/${oldID}.json`);
+                const data = await res.json();
+                await fetch(`${dbURL}/${newID}.json`, { method: 'PUT', body: JSON.stringify(data) });
+                await fetch(`${dbURL}/${oldID}.json`, { method: 'DELETE' });
+                loadUsers();
+            }
+        }
+
+        async function editPass(id) {
+            const p = prompt("Nova senha para " + id + ":");
+            if(p) { 
+                await fetch(`${dbURL}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ password: p }) }); 
+                loadUsers(); 
+            }
+        }
+
+        async function editDays(id) {
+            const d = prompt("Adicionar quantos dias a partir de agora?");
+            if(d) { 
+                let exp = (d >= 999) ? "PERMANENTE" : new Date().getTime() + (d * 24 * 60 * 60 * 1000);
+                await fetch(`${dbURL}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ expires: exp }) }); 
+                loadUsers(); 
+            }
+        }
+
+        // Funções Protegidas (Apenas Admin)
+        async function resetHWID(id) { 
+            if(currentUserRole !== "ADMIN") return alert("Ação restrita ao Administrador!");
+            if(confirm("Deseja liberar o HWID de " + id + "?")) {
+                await fetch(`${dbURL}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ hwid: "" }) }); 
+                loadUsers(); 
+            }
+        }
+
+        async function deleteUser(id) { 
+            if(currentUserRole !== "ADMIN") return alert("Ação restrita ao Administrador!");
+            if(confirm("Tem certeza que deseja DELETAR o usuário " + id + "?")) { 
+                await fetch(`${dbURL}/${id}.json`, { method: 'DELETE' }); 
+                loadUsers(); 
+            } 
+        }
+    </script>
+</body>
+</html>
