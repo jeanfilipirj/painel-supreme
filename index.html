@@ -2,210 +2,1541 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
-    <title>FP ADMIN - Supreme Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JON SISTEMA AUTO CLICK</title>
+
     <style>
-        :root { --primary: #00f2ff; --bg: #0a0a0a; --card: #151515; }
-        body { background: var(--bg); color: #fff; font-family: 'Segoe UI', sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
-        .glass-card { background: var(--card); border: 1px solid #333; border-radius: 15px; padding: 30px; width: 95%; max-width: 1250px; box-shadow: 0 0 30px rgba(0,242,255,0.1); }
-        h2 { color: var(--primary); text-transform: uppercase; letter-spacing: 3px; text-align: center; margin-bottom: 5px; }
-        #roleBadge { text-align: center; font-size: 10px; color: #888; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
-        .controls { background: #1a1a1a; padding: 20px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
-        input { padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 8px; outline: none; }
-        button { padding: 10px 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 11px; }
-        .btn-create { background: var(--primary); color: #000; padding: 12px 20px; font-size: 14px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { color: var(--primary); border-bottom: 2px solid var(--primary); padding: 12px; text-align: left; }
-        td { padding: 12px; border-bottom: 1px solid #222; font-size: 13px; }
-        .countdown { font-family: 'Courier New', monospace; color: #00f2ff; font-weight: bold; background: #000; padding: 4px 8px; border-radius: 5px; }
-        .status-on { color: #00ff88; font-weight: bold; }
-        .actions { display: flex; gap: 4px; }
-        .hwid-box { max-width: 120px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; color: #888; }
+        :root {
+            --primary: #00f2ff;
+            --bg: #0a0a0a;
+            --card: #151515;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            min-height: 100%;
+            overflow-y: auto;
+        }
+
+        body {
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 30px 20px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        .glass-card {
+            background: var(--card);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            width: 95%;
+            max-width: 1250px;
+            box-shadow: 0 0 30px rgba(0,242,255,0.1);
+            margin: 0 auto;
+        }
+
+        #loginSection {
+            margin-top: 20px;
+        }
+
+        #adminPanel {
+            margin-top: 0;
+            margin-bottom: 30px;
+        }
+
+        h2 {
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+
+        #roleBadge {
+            text-align: center;
+            font-size: 10px;
+            color: #888;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        input {
+            padding: 12px;
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 8px;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(0,242,255,0.2);
+        }
+
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 11px;
+        }
+
+        button:hover {
+            opacity: 0.85;
+            transform: scale(1.02);
+        }
+
+        .btn-create {
+            background: var(--primary);
+            color: #000;
+            padding: 12px 20px;
+            font-size: 14px;
+        }
+
+        .search-container {
+            background: #1a1a1a;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .search-container label {
+            display: block;
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        #searchNick {
+            width: 100%;
+            font-size: 14px;
+            padding: 13px;
+        }
+
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            min-width: 1050px;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th {
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+            padding: 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #222;
+            font-size: 13px;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.02);
+        }
+
+        .countdown {
+            font-family: 'Courier New', monospace;
+            color: #00f2ff;
+            font-weight: bold;
+            background: #000;
+            padding: 4px 8px;
+            border-radius: 5px;
+            white-space: nowrap;
+        }
+
+        .status-on {
+            color: #00ff88;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status-off {
+            color: #ff5555;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .offline-time {
+            color: #ffb000;
+            font-size: 11px;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .never-connected {
+            color: #777;
+            font-size: 11px;
+            display: block;
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+
+        .hwid-box {
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: block;
+            color: #888;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #777;
+            padding: 30px;
+            font-size: 13px;
+        }
+
+        .user-count {
+            text-align: right;
+            color: #777;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 15px 8px;
+            }
+
+            .glass-card {
+                width: 100%;
+                padding: 18px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls input,
+            .controls button {
+                width: 100%;
+            }
+
+            h2 {
+                font-size: 20px;
+            }
+        }
     </style>
 </head>
+
 <body>
-    <div id="loginSection" class="glass-card" style="max-width: 400px;">
-        <h2>FP ADMIN</h2>
-        <p style="text-align: center; color: #555; font-size: 12px;">Insira sua Chave de Acesso</p>
-        <input type="password" id="adminPass" placeholder="Chave de Acesso" style="width: 85%; display: block; margin: 10px auto;">
-        <button class="btn-create" style="width: 92%; display: block; margin: 10px auto;" onclick="checkAdmin()">ENTRAR NO SISTEMA</button>
+
+    <div id="loginSection" class="glass-card" style="max-width:400px;">
+
+        <h2>JON SISTEMA AUTO CLICK</h2>
+
+        <p style="text-align:center;color:#555;font-size:12px;">
+            Insira sua Chave de Acesso
+        </p>
+
+        <input
+            type="password"
+            id="adminPass"
+            placeholder="Chave de Acesso"
+            style="width:85%;display:block;margin:10px auto;"
+        >
+
+        <button
+            class="btn-create"
+            style="width:92%;display:block;margin:10px auto;"
+            onclick="checkAdmin()"
+        >
+            ENTRAR NO SISTEMA
+        </button>
+
     </div>
+
 
     <div id="adminPanel" class="glass-card" style="display:none;">
-        <h2>PAINEL SUPREME - FP</h2>
-        <div id="roleBadge">Acesso: <span id="currentRoleText">---</span></div>
-        
-        <div class="controls">
-            <input type="text" id="u" placeholder="Novo Usuário">
-            <input type="text" id="p" placeholder="Senha">
-            <input type="number" id="d" placeholder="Dias (999=Perm)">
-            <button class="btn-create" onclick="createUser()">CRIAR ACESSO</button>
+
+        <h2>JON SISTEMA AUTO CLICK</h2>
+
+        <div id="roleBadge">
+            Acesso:
+            <span id="currentRoleText">---</span>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Usuário</th>
-                    <th>Senha</th>
-                    <th>Tempo Restante</th>
-                    <th>Status</th>
-                    <th>HWID</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="userList"></tbody>
-        </table>
+
+
+        <div class="controls">
+
+            <input
+                type="text"
+                id="u"
+                placeholder="Novo Usuário"
+            >
+
+            <input
+                type="text"
+                id="p"
+                placeholder="Senha"
+            >
+
+            <input
+                type="number"
+                id="d"
+                placeholder="Dias (999=Perm)"
+            >
+
+            <button
+                class="btn-create"
+                onclick="createUser()"
+            >
+                CRIAR ACESSO
+            </button>
+
+        </div>
+
+
+        <div class="search-container">
+
+            <label>
+                🔎 PESQUISAR USUÁRIO POR NICK
+            </label>
+
+            <input
+                type="text"
+                id="searchNick"
+                placeholder="Digite o nick para pesquisar..."
+                oninput="filterUsers()"
+            >
+
+        </div>
+
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Senha</th>
+                        <th>Tempo Restante</th>
+                        <th>Status</th>
+                        <th>Offline há</th>
+                        <th>HWID</th>
+                        <th>Ações</th>
+                    </tr>
+
+                </thead>
+
+                <tbody id="userList"></tbody>
+
+            </table>
+
+        </div>
+
+
+        <div class="user-count" id="userCount">
+            0 usuários
+        </div>
+
     </div>
 
+
     <script>
-        const dbURL = "https://fp-autoclick-default-rtdb.firebaseio.com/usuarios";
-        let currentUserRole = ""; 
+
+        const dbURL =
+            "https://fp-autoclick-default-rtdb.firebaseio.com/usuarios";
+
+        let currentUserRole = "";
+        let usersData = {};
+        let loadInterval = null;
+
 
         function checkAdmin() {
-            const pass = document.getElementById('adminPass').value;
-            
-            if(pass === "JON2026") {
+
+            const pass =
+                document.getElementById("adminPass").value;
+
+            if (pass === "JON2026") {
+
                 currentUserRole = "ADMIN";
                 iniciarPainel();
-            } else if(pass === "JONMOD") { // Senha do Moderador
+
+            } else if (pass === "JONMOD") {
+
                 currentUserRole = "MOD";
                 iniciarPainel();
-            } else { 
-                alert("Acesso Negado!"); 
+
+            } else {
+
+                alert("Acesso Negado!");
+
             }
         }
 
+
         function iniciarPainel() {
-            document.getElementById('loginSection').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('currentRoleText').innerText = currentUserRole;
+
+            document.getElementById("loginSection").style.display = "none";
+
+            document.getElementById("adminPanel").style.display = "block";
+
+            document.getElementById("currentRoleText").innerText =
+                currentUserRole;
+
             loadUsers();
-            setInterval(loadUsers, 10000);
+
+            if (!loadInterval) {
+
+                loadInterval = setInterval(
+                    loadUsers,
+                    10000
+                );
+
+            }
+
             startClock();
         }
 
+
         async function createUser() {
-            const u = document.getElementById('u').value.trim();
-            const p = document.getElementById('p').value.trim();
-            const d = document.getElementById('d').value;
-            if(!u || !p || !d) return alert("Preencha todos os campos!");
-            
-            let exp = (d >= 999) ? "PERMANENTE" : new Date().getTime() + (d * 24 * 60 * 60 * 1000);
-            
-            await fetch(`${dbURL}/${u}.json`, { 
-                method: 'PUT', 
-                body: JSON.stringify({ password: p, hwid: "", expires: exp, last_seen: 0 }) 
-            });
-            
-            document.getElementById('u').value = "";
-            document.getElementById('p').value = "";
-            document.getElementById('d').value = "";
-            loadUsers();
-        }
 
-        async function loadUsers() {
-            const res = await fetch(`${dbURL}.json`);
-            const data = await res.json();
-            const list = document.getElementById('userList');
-            if(!data) { list.innerHTML = ""; return; }
-            
-            list.innerHTML = "";
-            const agora = new Date().getTime();
-            
-            for (let id in data) {
-                let isOnline = (agora - data[id].last_seen) < 60000;
-                
-                // Lógica de botões baseada no cargo
-                let botoesAcao = `
-                    <button style="background:#3498db; color:white" onclick="editID('${id}')">User</button>
-                    <button style="background:#9b59b6; color:white" onclick="editPass('${id}')">Senha</button>
-                    <button style="background:#2ecc71; color:white" onclick="editDays('${id}')">Dias</button>
-                `;
+            const u =
+                document.getElementById("u").value.trim();
 
-                if (currentUserRole === "ADMIN") {
-                    botoesAcao += `
-                        <button style="background:orange; color:black" onclick="resetHWID('${id}')">Reset</button>
-                        <button style="background:red; color:white" onclick="deleteUser('${id}')">X</button>
-                    `;
+            const p =
+                document.getElementById("p").value.trim();
+
+            const d =
+                document.getElementById("d").value;
+
+
+            if (!u || !p || !d) {
+
+                alert("Preencha todos os campos!");
+                return;
+
+            }
+
+
+            try {
+
+                const checkResponse =
+                    await fetch(
+                        `${dbURL}/${encodeURIComponent(u)}.json`
+                    );
+
+
+                if (!checkResponse.ok) {
+
+                    throw new Error(
+                        "Não foi possível verificar o nick."
+                    );
+
                 }
 
-                list.innerHTML += `<tr>
-                    <td><b>${id}</b></td>
-                    <td>${data[id].password}</td>
-                    <td><span class="countdown" data-expire="${data[id].expires}">--</span></td>
-                    <td class="${isOnline ? 'status-on' : ''}">${isOnline ? '● ONLINE' : '○ offline'}</td>
-                    <td><span class="hwid-box" title="${data[id].hwid}">${data[id].hwid || "Livre"}</span></td>
-                    <td class="actions">
-                        ${botoesAcao}
-                    </td>
-                </tr>`;
+
+                const existingUser =
+                    await checkResponse.json();
+
+
+                if (existingUser !== null) {
+
+                    alert(
+                        "❌ ERRO!\n\n" +
+                        "O nick \"" +
+                        u +
+                        "\" já está cadastrado.\n\n" +
+                        "Escolha outro nick."
+                    );
+
+                    return;
+
+                }
+
+
+                const exp =
+                    Number(d) >= 999
+                        ? "PERMANENTE"
+                        : Date.now() +
+                          (
+                              Number(d) *
+                              86400000
+                          );
+
+
+                const response =
+                    await fetch(
+                        `${dbURL}/${encodeURIComponent(u)}.json`,
+                        {
+                            method: "PUT",
+                            body: JSON.stringify({
+                                password: p,
+                                hwid: "",
+                                expires: exp,
+                                last_seen: 0
+                            })
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Erro ao criar usuário."
+                    );
+
+                }
+
+
+                alert(
+                    "✅ Acesso criado com sucesso!"
+                );
+
+
+                document.getElementById("u").value = "";
+                document.getElementById("p").value = "";
+                document.getElementById("d").value = "";
+
+                loadUsers();
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "❌ Erro ao criar o acesso.\n\n" +
+                    error.message
+                );
+
             }
         }
+
+
+        async function loadUsers() {
+
+            try {
+
+                const res =
+                    await fetch(
+                        `${dbURL}.json`
+                    );
+
+
+                if (!res.ok) {
+
+                    throw new Error(
+                        "Erro ao acessar o banco."
+                    );
+
+                }
+
+
+                const data =
+                    await res.json();
+
+
+                usersData =
+                    data || {};
+
+
+                renderUsers(usersData);
+
+            } catch (error) {
+
+                console.error(
+                    "Erro ao carregar usuários:",
+                    error
+                );
+
+            }
+        }
+
+
+        function renderUsers(data) {
+
+            const list =
+                document.getElementById("userList");
+
+            list.innerHTML = "";
+
+            const agora =
+                Date.now();
+
+            const ids =
+                Object.keys(data || {});
+
+
+            if (ids.length === 0) {
+
+                list.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="empty-message">
+                            Nenhum usuário cadastrado.
+                        </td>
+                    </tr>
+                `;
+
+                updateUserCount(0);
+                return;
+
+            }
+
+
+            ids.forEach(function(id) {
+
+                const user =
+                    data[id] || {};
+
+
+                const lastSeen =
+                    Number(user.last_seen) || 0;
+
+
+                const isOnline =
+                    lastSeen > 0 &&
+                    (
+                        agora - lastSeen
+                    ) < 60000;
+
+
+                let botoesAcao = `
+
+                    <button
+                        style="background:#3498db;color:white;"
+                        onclick="editID('${escapeJS(id)}')"
+                    >
+                        User
+                    </button>
+
+                    <button
+                        style="background:#9b59b6;color:white;"
+                        onclick="editPass('${escapeJS(id)}')"
+                    >
+                        Senha
+                    </button>
+
+                    <button
+                        style="background:#2ecc71;color:white;"
+                        onclick="editDays('${escapeJS(id)}')"
+                    >
+                        Dias
+                    </button>
+
+                `;
+
+
+                if (currentUserRole === "ADMIN") {
+
+                    botoesAcao += `
+
+                        <button
+                            style="background:orange;color:black;"
+                            onclick="resetHWID('${escapeJS(id)}')"
+                        >
+                            Reset
+                        </button>
+
+                        <button
+                            style="background:red;color:white;"
+                            onclick="deleteUser('${escapeJS(id)}')"
+                        >
+                            X
+                        </button>
+
+                    `;
+
+                }
+
+
+                let offlineInfo = "";
+
+
+                if (isOnline) {
+
+                    offlineInfo = `
+                        <span style="color:#00ff88;">
+                            AGORA
+                        </span>
+                    `;
+
+                } else if (lastSeen <= 0) {
+
+                    offlineInfo = `
+                        <span class="never-connected">
+                            NUNCA CONECTOU
+                        </span>
+                    `;
+
+                } else {
+
+                    offlineInfo = `
+                        <span class="offline-time">
+                            ${getOfflineTime(lastSeen)}
+                        </span>
+                    `;
+
+                }
+
+
+                list.innerHTML += `
+
+                    <tr data-nick="${escapeHTML(id.toLowerCase())}">
+
+                        <td>
+                            <b>
+                                ${escapeHTML(id)}
+                            </b>
+                        </td>
+
+                        <td>
+                            ${escapeHTML(user.password || "")}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="countdown"
+                                data-expire="${escapeHTML(
+                                    user.expires || ""
+                                )}"
+                            >
+                                --
+                            </span>
+
+                        </td>
+
+                        <td
+                            class="${
+                                isOnline
+                                    ? "status-on"
+                                    : "status-off"
+                            }"
+                        >
+                            ${
+                                isOnline
+                                    ? "● ONLINE"
+                                    : "○ OFFLINE"
+                            }
+                        </td>
+
+                        <td>
+                            ${offlineInfo}
+                        </td>
+
+                        <td>
+
+                            <span
+                                class="hwid-box"
+                                title="${escapeHTML(
+                                    user.hwid || ""
+                                )}"
+                            >
+                                ${
+                                    escapeHTML(
+                                        user.hwid ||
+                                        "Livre"
+                                    )
+                                }
+                            </span>
+
+                        </td>
+
+                        <td class="actions">
+                            ${botoesAcao}
+                        </td>
+
+                    </tr>
+
+                `;
+
+            });
+
+
+            updateUserCount(ids.length);
+
+            filterUsers();
+
+        }
+
+
+        function filterUsers() {
+
+            const input =
+                document.getElementById("searchNick");
+
+            const search =
+                input
+                    ? input.value.trim().toLowerCase()
+                    : "";
+
+
+            const rows =
+                document.querySelectorAll(
+                    "#userList tr[data-nick]"
+                );
+
+
+            let visibleCount = 0;
+
+
+            rows.forEach(function(row) {
+
+                const nick =
+                    row.getAttribute("data-nick") || "";
+
+
+                if (nick.includes(search)) {
+
+                    row.style.display = "";
+                    visibleCount++;
+
+                } else {
+
+                    row.style.display = "none";
+
+                }
+
+            });
+
+
+            const oldMessage =
+                document.getElementById(
+                    "noSearchResult"
+                );
+
+
+            if (oldMessage) {
+
+                oldMessage.remove();
+
+            }
+
+
+            if (
+                visibleCount === 0 &&
+                search !== ""
+            ) {
+
+                const tr =
+                    document.createElement("tr");
+
+
+                tr.id =
+                    "noSearchResult";
+
+
+                tr.innerHTML = `
+                    <td colspan="7" class="empty-message">
+                        🔎 Nenhum usuário encontrado para
+                        "<b>${escapeHTML(search)}</b>"
+                    </td>
+                `;
+
+
+                document
+                    .getElementById("userList")
+                    .appendChild(tr);
+
+            }
+
+
+            updateUserCount(visibleCount);
+
+        }
+
+
+        function updateUserCount(count) {
+
+            document.getElementById(
+                "userCount"
+            ).innerText =
+                count +
+                (
+                    count === 1
+                        ? " usuário"
+                        : " usuários"
+                );
+
+        }
+
+
+        function getOfflineTime(lastSeen) {
+
+            const diff =
+                Date.now() - lastSeen;
+
+
+            if (diff < 0) {
+                return "AGORA";
+            }
+
+
+            const dias =
+                Math.floor(
+                    diff / 86400000
+                );
+
+
+            const horas =
+                Math.floor(
+                    (
+                        diff % 86400000
+                    ) / 3600000
+                );
+
+
+            const minutos =
+                Math.floor(
+                    (
+                        diff % 3600000
+                    ) / 60000
+                );
+
+
+            if (dias > 0) {
+
+                if (horas > 0) {
+
+                    return (
+                        "Há " +
+                        dias +
+                        "d " +
+                        horas +
+                        "h"
+                    );
+
+                }
+
+                return (
+                    "Há " +
+                    dias +
+                    " dias"
+                );
+
+            }
+
+
+            if (horas > 0) {
+
+                return (
+                    "Há " +
+                    horas +
+                    "h " +
+                    minutos +
+                    "min"
+                );
+
+            }
+
+
+            if (minutos > 0) {
+
+                return (
+                    "Há " +
+                    minutos +
+                    "min"
+                );
+
+            }
+
+
+            return "Há poucos segundos";
+
+        }
+
+
+        function updateOfflineTimes() {
+
+            const agora =
+                Date.now();
+
+
+            Object.keys(usersData).forEach(
+                function(id) {
+
+                    const user =
+                        usersData[id];
+
+
+                    const lastSeen =
+                        Number(user.last_seen) || 0;
+
+
+                    const rows =
+                        document.querySelectorAll(
+                            "#userList tr[data-nick]"
+                        );
+
+
+                    let row = null;
+
+
+                    rows.forEach(
+                        function(r) {
+
+                            if (
+                                r.getAttribute("data-nick") ===
+                                id.toLowerCase()
+                            ) {
+
+                                row = r;
+
+                            }
+
+                        }
+                    );
+
+
+                    if (!row) {
+                        return;
+                    }
+
+
+                    const isOnline =
+                        lastSeen > 0 &&
+                        (
+                            agora - lastSeen
+                        ) < 60000;
+
+
+                    const statusCell =
+                        row.children[3];
+
+
+                    const offlineCell =
+                        row.children[4];
+
+
+                    if (isOnline) {
+
+                        statusCell.className =
+                            "status-on";
+
+                        statusCell.innerHTML =
+                            "● ONLINE";
+
+                        offlineCell.innerHTML = `
+                            <span style="color:#00ff88;">
+                                AGORA
+                            </span>
+                        `;
+
+                    } else {
+
+                        statusCell.className =
+                            "status-off";
+
+                        statusCell.innerHTML =
+                            "○ OFFLINE";
+
+
+                        if (lastSeen <= 0) {
+
+                            offlineCell.innerHTML = `
+                                <span class="never-connected">
+                                    NUNCA CONECTOU
+                                </span>
+                            `;
+
+                        } else {
+
+                            offlineCell.innerHTML = `
+                                <span class="offline-time">
+                                    ${getOfflineTime(lastSeen)}
+                                </span>
+                            `;
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
 
         function startClock() {
-            setInterval(() => {
-                document.querySelectorAll('.countdown').forEach(el => {
-                    const exp = el.getAttribute('data-expire');
-                    if(exp === "PERMANENTE") { el.innerHTML = "VITALÍCIO"; return; }
-                    
-                    const diff = exp - new Date().getTime();
-                    if(diff <= 0) { 
-                        el.innerHTML = "EXPIRADO"; 
-                        el.style.color = "red"; 
-                    } else {
-                        const d = Math.floor(diff / 86400000);
-                        const h = Math.floor((diff % 86400000) / 3600000);
-                        const m = Math.floor((diff % 3600000) / 60000);
-                        const s = Math.floor((diff % 60000) / 1000);
-                        el.innerHTML = `${d}d ${h}h ${m}m ${s}s`;
-                    }
-                });
+
+            setInterval(function() {
+
+                document
+                    .querySelectorAll(".countdown")
+                    .forEach(function(el) {
+
+                        const exp =
+                            el.getAttribute(
+                                "data-expire"
+                            );
+
+
+                        if (exp === "PERMANENTE") {
+
+                            el.innerHTML =
+                                "VITALÍCIO";
+
+                            el.style.color =
+                                "#00ff88";
+
+                            return;
+
+                        }
+
+
+                        const expireTime =
+                            Number(exp);
+
+
+                        if (!expireTime) {
+
+                            el.innerHTML = "—";
+                            return;
+
+                        }
+
+
+                        const diff =
+                            expireTime -
+                            Date.now();
+
+
+                        if (diff <= 0) {
+
+                            el.innerHTML =
+                                "EXPIRADO";
+
+                            el.style.color =
+                                "red";
+
+                            return;
+
+                        }
+
+
+                        const d =
+                            Math.floor(
+                                diff / 86400000
+                            );
+
+
+                        const h =
+                            Math.floor(
+                                (
+                                    diff %
+                                    86400000
+                                ) / 3600000
+                            );
+
+
+                        const m =
+                            Math.floor(
+                                (
+                                    diff %
+                                    3600000
+                                ) / 60000
+                            );
+
+
+                        const s =
+                            Math.floor(
+                                (
+                                    diff %
+                                    60000
+                                ) / 1000
+                            );
+
+
+                        el.innerHTML =
+                            `${d}d ${h}h ${m}m ${s}s`;
+
+                        el.style.color =
+                            "#00f2ff";
+
+                    });
+
+
+                updateOfflineTimes();
+
             }, 1000);
+
         }
 
-        // Funções de Edição
+
         async function editID(oldID) {
-            const newID = prompt("Novo nome de usuário:", oldID);
-            if(newID && newID !== oldID) {
-                const res = await fetch(`${dbURL}/${oldID}.json`);
-                const data = await res.json();
-                await fetch(`${dbURL}/${newID}.json`, { method: 'PUT', body: JSON.stringify(data) });
-                await fetch(`${dbURL}/${oldID}.json`, { method: 'DELETE' });
-                loadUsers();
+
+            const newID =
+                prompt(
+                    "Novo nome de usuário:",
+                    oldID
+                );
+
+
+            if (
+                !newID ||
+                newID.trim() === oldID
+            ) {
+                return;
             }
+
+
+            const cleanNewID =
+                newID.trim();
+
+
+            if (!cleanNewID) {
+
+                alert(
+                    "Digite um nick válido."
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                const checkResponse =
+                    await fetch(
+                        `${dbURL}/${encodeURIComponent(
+                            cleanNewID
+                        )}.json`
+                    );
+
+
+                if (!checkResponse.ok) {
+
+                    throw new Error(
+                        "Não foi possível verificar o novo nick."
+                    );
+
+                }
+
+
+                const existingUser =
+                    await checkResponse.json();
+
+
+                if (existingUser !== null) {
+
+                    alert(
+                        "❌ ERRO!\n\n" +
+                        "O nick \"" +
+                        cleanNewID +
+                        "\" já está cadastrado."
+                    );
+
+                    return;
+
+                }
+
+
+                const res =
+                    await fetch(
+                        `${dbURL}/${encodeURIComponent(
+                            oldID
+                        )}.json`
+                    );
+
+
+                const data =
+                    await res.json();
+
+
+                if (!data) {
+
+                    alert(
+                        "Usuário não encontrado."
+                    );
+
+                    return;
+
+                }
+
+
+                const response =
+                    await fetch(
+                        `${dbURL}/${encodeURIComponent(
+                            cleanNewID
+                        )}.json`,
+                        {
+                            method: "PUT",
+                            body: JSON.stringify(data)
+                        }
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Erro ao criar o novo nick."
+                    );
+
+                }
+
+
+                await fetch(
+                    `${dbURL}/${encodeURIComponent(
+                        oldID
+                    )}.json`,
+                    {
+                        method: "DELETE"
+                    }
+                );
+
+
+                alert(
+                    "✅ Nick alterado com sucesso!"
+                );
+
+
+                loadUsers();
+
+            } catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "❌ Erro ao alterar o nick.\n\n" +
+                    error.message
+                );
+
+            }
+
         }
+
 
         async function editPass(id) {
-            const p = prompt("Nova senha para " + id + ":");
-            if(p) { 
-                await fetch(`${dbURL}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ password: p }) }); 
-                loadUsers(); 
+
+            const p =
+                prompt(
+                    "Nova senha para " + id + ":"
+                );
+
+
+            if (!p) {
+                return;
             }
+
+
+            await fetch(
+                `${dbURL}/${encodeURIComponent(id)}.json`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        password: p
+                    })
+                }
+            );
+
+
+            loadUsers();
+
         }
+
 
         async function editDays(id) {
-            const d = prompt("Adicionar quantos dias a partir de agora?");
-            if(d) { 
-                let exp = (d >= 999) ? "PERMANENTE" : new Date().getTime() + (d * 24 * 60 * 60 * 1000);
-                await fetch(`${dbURL}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ expires: exp }) }); 
-                loadUsers(); 
+
+            const d =
+                prompt(
+                    "Adicionar quantos dias a partir de agora?"
+                );
+
+
+            if (!d) {
+                return;
             }
+
+
+            const dias =
+                Number(d);
+
+
+            if (
+                isNaN(dias) ||
+                dias <= 0
+            ) {
+
+                alert(
+                    "Digite uma quantidade de dias válida."
+                );
+
+                return;
+
+            }
+
+
+            const exp =
+                dias >= 999
+                    ? "PERMANENTE"
+                    : Date.now() +
+                      (
+                          dias *
+                          86400000
+                      );
+
+
+            await fetch(
+                `${dbURL}/${encodeURIComponent(id)}.json`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        expires: exp
+                    })
+                }
+            );
+
+
+            loadUsers();
+
         }
 
-        // Funções Protegidas (Apenas Admin)
-        async function resetHWID(id) { 
-            if(currentUserRole !== "ADMIN") return alert("Ação restrita ao Administrador!");
-            if(confirm("Deseja liberar o HWID de " + id + "?")) {
-                await fetch(`${dbURL}/${id}.json`, { method: 'PATCH', body: JSON.stringify({ hwid: "" }) }); 
-                loadUsers(); 
+
+        async function resetHWID(id) {
+
+            if (currentUserRole !== "ADMIN") {
+
+                alert(
+                    "Ação restrita ao Administrador!"
+                );
+
+                return;
+
             }
+
+
+            if (
+                !confirm(
+                    "Deseja liberar o HWID de " +
+                    id +
+                    "?"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            await fetch(
+                `${dbURL}/${encodeURIComponent(id)}.json`,
+                {
+                    method: "PATCH",
+                    body: JSON.stringify({
+                        hwid: ""
+                    })
+                }
+            );
+
+
+            loadUsers();
+
         }
 
-        async function deleteUser(id) { 
-            if(currentUserRole !== "ADMIN") return alert("Ação restrita ao Administrador!");
-            if(confirm("Tem certeza que deseja DELETAR o usuário " + id + "?")) { 
-                await fetch(`${dbURL}/${id}.json`, { method: 'DELETE' }); 
-                loadUsers(); 
-            } 
+
+        async function deleteUser(id) {
+
+            if (currentUserRole !== "ADMIN") {
+
+                alert(
+                    "Ação restrita ao Administrador!"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                !confirm(
+                    "Tem certeza que deseja DELETAR o usuário " +
+                    id +
+                    "?"
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            await fetch(
+                `${dbURL}/${encodeURIComponent(id)}.json`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+            loadUsers();
+
         }
+
+
+        function escapeHTML(value) {
+
+            return String(value)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+
+        }
+
+
+        function escapeJS(value) {
+
+            return String(value)
+                .replace(/\\/g, "\\\\")
+                .replace(/'/g, "\\'");
+
+        }
+
     </script>
+
 </body>
 </html>
