@@ -587,38 +587,43 @@
                           );
 
 
-                // One atomic update: the new access and its log are saved together.
-                const logID = crypto.randomUUID();
-                const updates = {};
-                updates[`usuarios/${u}`] = {
-                    password: p, hwid: "", expires: exp, last_seen: 0
-                };
-                updates[`logs/${logID}`] = {
-                    action: "CREATE_USER",
-                    admin: currentAdminName,
-                    role: currentUserRole,
-                    login: u,
-                    days: Number(d) >= 999 ? "PERMANENTE" : Number(d),
-                    created_at: { ".sv": "timestamp" }
-                };
-                const response = await fetch(`${databaseRoot}.json`, {
-                    method: "PATCH",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(updates)
+                const response = await fetch(`${dbURL}/${encodeURIComponent(u)}.json`, {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        password: p, hwid: "", expires: exp, last_seen: 0
+                    })
                 });
 
                 if (!response.ok) {
 
                     throw new Error(
-                        "Não foi possível salvar o usuário e seu log. Confira as permissões do Firebase."
+                        "Não foi possível criar o usuário. Confira a conexão e as permissões do Firebase."
                     );
 
                 }
 
 
-                alert(
-                    "✅ Acesso criado com sucesso!"
-                );
+                let logSaved = false;
+                try {
+                    const logResponse = await fetch(`${logsURL}.json`, {
+                        method: "POST",
+                        body: JSON.stringify({
+                            action: "CREATE_USER",
+                            admin: currentAdminName,
+                            role: currentUserRole,
+                            login: u,
+                            days: Number(d) >= 999 ? "PERMANENTE" : Number(d),
+                            created_at: { ".sv": "timestamp" }
+                        })
+                    });
+                    if (!logResponse.ok) throw new Error(`Firebase: ${logResponse.status}`);
+                    logSaved = true;
+                } catch (logError) {
+                    console.error("Usuário criado, mas houve falha no log:", logError);
+                }
+                alert(logSaved
+                    ? "✅ Acesso criado e log registrado com sucesso!"
+                    : "⚠️ O usuário foi criado, mas o log não foi salvo. Não repita o cadastro. Confira a conexão e a permissão de gravação em /logs no Firebase.");
 
 
                 document.getElementById("u").value = "";
