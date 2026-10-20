@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JON SISTEMA AUTO CLICK</title>
+    <title>SISTEMA AUTO CLICK</title>
 
     <style>
         :root {
@@ -272,7 +272,7 @@
 
     <div id="loginSection" class="glass-card" style="max-width:400px;">
 
-        <h2>JON SISTEMA AUTO CLICK</h2>
+        <h2>SISTEMA AUTO CLICK</h2>
 
         <p style="text-align:center;color:#555;font-size:12px;">
             Insira sua Chave de Acesso
@@ -298,7 +298,7 @@
 
     <div id="adminPanel" class="glass-card" style="display:none;">
 
-        <h2>JON SISTEMA AUTO CLICK</h2>
+        <h2>SISTEMA AUTO CLICK</h2>
 
         <div id="roleBadge">
             Acesso:
@@ -306,6 +306,11 @@
         </div>
 
 
+        <div style="display:flex;gap:10px;margin-bottom:20px;">
+            <button class="btn-create" onclick="showTab('users')">USUÁRIOS</button>
+            <button id="logsTabButton" class="btn-create" style="display:none;" onclick="showTab('logs')">LOGS</button>
+        </div>
+        <div id="usersTab">
         <div class="controls">
 
             <input
@@ -380,6 +385,18 @@
         <div class="user-count" id="userCount">
             0 usuários
         </div>
+        </div>
+        <div id="logsTab" style="display:none;">
+            <h2>Histórico de criação de acessos</h2>
+            <button onclick="loadLogs()">ATUALIZAR LOGS</button>
+            <p id="logsStatus" role="status"></p>
+            <div class="table-container">
+                <table style="min-width:700px;">
+                    <thead><tr><th>Quem criou</th><th>Perfil</th><th>Login criado</th><th>Prazo</th><th>Data e hora (Brasília)</th></tr></thead>
+                    <tbody id="logsList"></tbody>
+                </table>
+            </div>
+        </div>
 
     </div>
 
@@ -389,6 +406,9 @@
         const dbURL =
             "https://fp-autoclick-default-rtdb.firebaseio.com/usuarios";
 
+        const databaseRoot = dbURL.slice(0, dbURL.lastIndexOf('/'));
+        const logsURL = `${databaseRoot}/logs`;
+        let currentAdminName = "";
         let currentUserRole = "";
         let usersData = {};
         let loadInterval = null;
@@ -399,13 +419,21 @@
             const pass =
                 document.getElementById("adminPass").value;
 
-            if (pass === "JON2026") {
+            if (pass === "JOTA2026") {
 
+                currentAdminName = "JOTA";
+                currentUserRole = "SUPERADMIN";
+                iniciarPainel();
+
+            } else if (pass === "JON2026" || pass === "SNT2026") {
+
+                currentAdminName = pass === "JON2026" ? "JON" : "SNT";
                 currentUserRole = "ADMIN";
                 iniciarPainel();
 
             } else if (pass === "JONMOD") {
 
+                currentAdminName = "MOD";
                 currentUserRole = "MOD";
                 iniciarPainel();
 
@@ -426,6 +454,9 @@
             document.getElementById("currentRoleText").innerText =
                 currentUserRole;
 
+            document.getElementById("logsTabButton").style.display =
+                currentUserRole === "SUPERADMIN" ? "inline-block" : "none";
+            showTab('users');
             loadUsers();
 
             if (!loadInterval) {
@@ -440,6 +471,42 @@
             startClock();
         }
 
+
+        function showTab(tab) {
+            if (tab === 'logs' && currentUserRole !== 'SUPERADMIN') return;
+            document.getElementById('usersTab').style.display = tab === 'logs' ? 'none' : 'block';
+            document.getElementById('logsTab').style.display = tab === 'logs' ? 'block' : 'none';
+            if (tab === 'logs') loadLogs();
+        }
+
+        async function loadLogs() {
+            if (currentUserRole !== 'SUPERADMIN') return;
+            const list = document.getElementById('logsList');
+            const status = document.getElementById('logsStatus');
+            list.innerHTML = '';
+            status.textContent = 'Carregando...';
+            try {
+                const response = await fetch(`${logsURL}.json`);
+                if (!response.ok) throw new Error('Não foi possível carregar os logs. Confira as permissões do Firebase.');
+                const data = await response.json();
+                if (currentUserRole !== 'SUPERADMIN') return;
+                const logs = Object.values(data || {}).filter(log => log && typeof log === 'object')
+                    .sort((a, b) => Number(b.created_at) - Number(a.created_at));
+                const formatter = new Intl.DateTimeFormat('pt-BR', {
+                    timeZone: 'America/Sao_Paulo', dateStyle: 'short', timeStyle: 'medium'
+                });
+                list.innerHTML = logs.map(log => {
+                    const timestamp = Number(log.created_at);
+                    const date = Number.isFinite(timestamp) && timestamp > 0
+                        ? formatter.format(new Date(timestamp)) : '—';
+                    const days = log.days === 'PERMANENTE' ? 'Permanente' : `${log.days} dias`;
+                    return `<tr><td>${escapeHTML(log.admin || '—')}</td><td>${escapeHTML(log.role || '—')}</td><td>${escapeHTML(log.login || '—')}</td><td>${escapeHTML(days)}</td><td>${escapeHTML(date)}</td></tr>`;
+                }).join('');
+                status.textContent = logs.length ? `${logs.length} registro(s)` : 'Nenhuma criação registrada ainda.';
+            } catch (error) {
+                status.textContent = error.message;
+            }
+        }
 
         async function createUser() {
 
@@ -460,6 +527,19 @@
 
             }
 
+
+            if (!currentAdminName || !["SUPERADMIN", "ADMIN", "MOD"].includes(currentUserRole)) {
+                alert("Entre no sistema para criar acessos.");
+                return;
+            }
+            if (/[.#$\[\]\/\u0000-\u001f\u007f]/.test(u)) {
+                alert("O nick não pode conter . # $ [ ] / ou caracteres de controle.");
+                return;
+            }
+            if (!Number.isFinite(Number(d)) || Number(d) <= 0) {
+                alert("Informe uma quantidade de dias maior que zero.");
+                return;
+            }
 
             try {
 
@@ -507,25 +587,30 @@
                           );
 
 
-                const response =
-                    await fetch(
-                        `${dbURL}/${encodeURIComponent(u)}.json`,
-                        {
-                            method: "PUT",
-                            body: JSON.stringify({
-                                password: p,
-                                hwid: "",
-                                expires: exp,
-                                last_seen: 0
-                            })
-                        }
-                    );
-
+                // One atomic update: the new access and its log are saved together.
+                const logID = crypto.randomUUID();
+                const updates = {};
+                updates[`usuarios/${u}`] = {
+                    password: p, hwid: "", expires: exp, last_seen: 0
+                };
+                updates[`logs/${logID}`] = {
+                    action: "CREATE_USER",
+                    admin: currentAdminName,
+                    role: currentUserRole,
+                    login: u,
+                    days: Number(d) >= 999 ? "PERMANENTE" : Number(d),
+                    created_at: { ".sv": "timestamp" }
+                };
+                const response = await fetch(`${databaseRoot}.json`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(updates)
+                });
 
                 if (!response.ok) {
 
                     throw new Error(
-                        "Erro ao criar usuário."
+                        "Não foi possível salvar o usuário e seu log. Confira as permissões do Firebase."
                     );
 
                 }
@@ -668,7 +753,7 @@
                 `;
 
 
-                if (currentUserRole === "ADMIN") {
+                if (currentUserRole === "ADMIN" || currentUserRole === "SUPERADMIN") {
 
                     botoesAcao += `
 
@@ -678,6 +763,14 @@
                         >
                             Reset
                         </button>
+
+                    `;
+
+                }
+
+                if (currentUserRole === "SUPERADMIN") {
+
+                    botoesAcao += `
 
                         <button
                             style="background:red;color:white;"
@@ -1437,7 +1530,7 @@
 
         async function resetHWID(id) {
 
-            if (currentUserRole !== "ADMIN") {
+            if (currentUserRole !== "ADMIN" && currentUserRole !== "SUPERADMIN") {
 
                 alert(
                     "Ação restrita ao Administrador!"
@@ -1479,10 +1572,10 @@
 
         async function deleteUser(id) {
 
-            if (currentUserRole !== "ADMIN") {
+            if (currentUserRole !== "SUPERADMIN") {
 
                 alert(
-                    "Ação restrita ao Administrador!"
+                    "Exclusão permitida somente ao acesso JOTA2026!"
                 );
 
                 return;
